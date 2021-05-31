@@ -12,9 +12,10 @@ class PhotoList(ListView):
     model = Photo
     template_name_suffix = '_list'
 
+# 게시물 게시 기능
 class PhotoCreate(CreateView):
     model = Photo
-    fields = ['text','image']
+    fields = ['author','text','image']
     template_name_suffix = '_create'
     success_url = '/'
 
@@ -26,9 +27,10 @@ class PhotoCreate(CreateView):
         else:
             return self.render_to_response({'form':form})
 
+# 게시물 수정하기 기능
 class PhotoUpdate(UpdateView):
     model = Photo
-    fields = ['text', 'image']
+    fields = ['author','text', 'image']
     template_name_suffix = '_update'
     success_url = '/'
 
@@ -40,7 +42,7 @@ class PhotoUpdate(UpdateView):
         else:
             return super(PhotoUpdate, self).dispatch(request, *args, **kwargs)
 
-
+# 게시물 삭제
 class PhotoDelete(DeleteView):
     model = Photo
     template_name_suffix = '_delete'
@@ -52,14 +54,14 @@ class PhotoDelete(DeleteView):
             messages.warning(request, '삭제할 권한이 없습니다.')
             return HttpResponseRedirect('/')
         else:
-            return super(PhotoUpdate, self).dispatch(request, *args, **kwargs)
+            return super(PhotoDelete, self).dispatch(request, *args, **kwargs)
 
-
+# 게시물에 관해 자세한 기능
 class PhotoDetail(DetailView):
     model = Photo
     template_name_suffix = '_detail'
 
-
+# 게시물 좋아요 기능
 class PhotoLike(View):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -78,6 +80,7 @@ class PhotoLike(View):
             path = urlparse(referer_url).path
             return HttpResponseRedirect(path)
 
+# 게시물 저장 기능
 class PhotoFavorite(View):
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
@@ -95,3 +98,47 @@ class PhotoFavorite(View):
             referer_url = request.META.get('HTTP_REFERER')
             path = urlparse(referer_url).path
             return HttpResponseRedirect(path)
+
+# 좋아요한 게시물 리스트
+class PhotoLikeList(ListView):
+    model = Photo
+    template_name = "photo/photo_list.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(request, "로그인을 먼저 하세요")
+            return HttpResponseRedirect('/')
+
+        return super(PhotoLikeList,self).dispatch(request, *args, **kwargs)
+    def get_queryset(self):
+        user = self.request.user
+        queryset = user.like_post.all()
+        return queryset
+
+# 저장한 게시물 리스트
+class PhotoFavoriteList(ListView):
+    model = Photo
+    template_name = "photo/photo_list.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(request, "로그인을 먼저 하세요")
+            return HttpResponseRedirect('/')
+        return super(PhotoFavoriteList, self).dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = user.favorite_post.all()
+        return queryset
+
+# 내가 좋아요하고 저장한 게시물 보기
+class PhotoMyList(ListView):
+    model = Photo
+    template_name = 'photo/photo_mylist.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            messages.warning(request, "로그인을 먼저 하세요")
+            return HttpResponseRedirect('/')
+        return super(PhotoMyList, self).dispatch(request, *args, **kwargs)
+

@@ -77,11 +77,20 @@
                     <a class="nav-link" href="{% url 'photo:create' %}">사진 업로드</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'accounts:logout' %}">Logout</a>
+                    <a class="nav-link" href="{% url 'accounts:logout' %}">로그아웃</a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'photo:like_list' %}">좋아요 사진</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'photo:favorite_list' %}">저장한 사진</a>
                 </li>
                 {% else %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'accounts:login' %}">Login</a>
+                    <a class="nav-link" href="{% url 'accounts:login' %}">로그인</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'accounts:signup' %}">회원가입</a>
                 </li>
                 {% endif %}
 
